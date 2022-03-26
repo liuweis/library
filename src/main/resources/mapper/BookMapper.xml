@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.library.mapper.BookMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.book.library.domain.Book">
+        <result column="book_id" property="bookId"/>
+        <result column="book_name" property="bookName"/>
+        <result column="author" property="author"/>
+        <result column="publisher" property="publisher"/>
+        <result column="publish_date" property="publishDate"/>
+        <result column="price" property="price"/>
+        <result column="book_type" property="bookType"/>
+        <result column="store_location" property="storeLocation"/>
+        <result column="store_date" property="storeDate"/>
+        <result column="borrowed_number" property="borrowedNumber"/>
+        <result column="number" property="number"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_time" property="createTime"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        book_id,
+        book_name,
+        author,
+        publisher,
+        publish_date,
+        price,
+        book_type,
+        store_location,
+        store_date,
+        borrowed_number,
+        number,
+        create_time,
+        created_by,
+        update_time,
+        updated_by
+    </sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="SEARCH_WHERE">
+        is_deleted = 0
+        <if test="bookNumber != null">
+            AND book_id = #{bookId}
+        </if>
+        <if test="bookName != null and bookName != ''">
+            AND book_name LIKE CONCAT('%',#{bookName},'%')
+        </if>
+        <if test="author != null and author != ''">
+            AND author LIKE CONCAT('%',#{author},'%')
+        </if>
+        <if test="publisher != null and publisher != ''">
+            AND publisher LIKE CONCAT('%',#{publisher},'%')
+        </if>
+        <if test="publishDate != null">
+            AND publish_date = #{publishDate}
+        </if>
+        <if test="price != null">
+            AND price = #{price}
+        </if>
+        <if test="bookType != null and bookType != ''">
+            AND book_type LIKE CONCAT('%',#{bookType},'%')
+        </if>
+        <if test="storeLocation != null and storeLocation != ''">
+            AND store_location LIKE CONCAT('%',#{storeLocation},'%')
+        </if>
+        <if test="storeDate != null">
+            AND store_date = #{storeDate}
+        </if>
+        <if test="borrowedNumber != null">
+            AND borrowed_number = #{borrowedNumber}
+        </if>
+        <if test="number != null">
+            AND number = #{number}
+        </if>
+        <if test="isDelete != null">
+            AND is_delete = #{isDelete}
+        </if>
+    </sql>
+
+    <!-- 批量插入-->
+    <insert id="insertBatch">
+        INSERT INTO
+        t_book
+        (
+        <include refid="Base_Column_List"/>
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.bookNumber },
+            #{item.bookName },
+            #{item.author },
+            #{item.publisher },
+            #{item.publishDate },
+            #{item.price },
+            #{item.bookType },
+            #{item.storeLocation },
+            #{item.storeDate },
+            #{item.borrowedNumber },
+            #{item.number },
+            #{item.createTime },
+            #{item.createdBy },
+            #{item.updateTime },
+            #{item.updatedBy}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量修改-->
+    <update id="updateBatch">
+        update t_book
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="book_name =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.bookName != null">
+                        when book_id=#{item.id}
+                        then #{item.bookName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="author =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.author != null">
+                        when book_id=#{item.id}
+                        then #{item.author}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="publisher =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.publisher != null">
+                        when book_id=#{item.id}
+                        then #{item.publisher}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="publish_date =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.publishDate != null">
+                        when book_id=#{item.id}
+                        then #{item.publishDate}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="price =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.price != null">
+                        when book_id=#{item.bookId}
+                        then #{item.price}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="book_type =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.bookType != null">
+                        when book_id=#{item.bookId}
+                        then #{item.bookType}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="store_location =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.storeLocation != null">
+                        when book_id=#{item.bookId}
+                        then #{item.storeLocation}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="store_date =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.storeDate != null">
+                        when book_id=#{item.bookId}
+                        then #{item.storeDate}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="borrowed_number =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.borrowedNumber != null">
+                        when book_id=#{item.bookId}
+                        then #{item.borrowedNumber}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="number =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.number != null">
+                        when book_id=#{item.bookId}
+                        then #{item.number}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="is_delete =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.isDelete != null">
+                        when book_id=#{item.bookId}
+                        then #{item.isDelete}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createTime != null">
+                        when book_id=#{item.bookId}
+                        then #{item.createTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="created_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createdBy != null">
+                        when book_id=#{item.bookId}
+                        then #{item.createdBy}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="update_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updateTime != null">
+                        when book_id=#{item.bookId}
+                        then #{item.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="updated_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updatedBy != null">
+                        when book_id=#{item.bookId}
+                        then #{item.updatedBy}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where book_id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.bookId}
+        </foreach>
+    </update>
+
+
+    <update id="updateBookNum">
+        update t_book
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="borrowed_number =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.borrowedNumber != null">
+                        when book_id=#{item.bookId}
+                        then #{item.borrowedNumber}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="number =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.number != null">
+                        when book_id=#{item.bookId}
+                        then #{item.number}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="or" item="item" index="index">
+            book_id = #{item.bookId}
+        </foreach>
+    </update>
+
+
+    <select id="findBookListById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_book where is_delete = 0 and number > 0
+        <if test="id!=null and id.size()>0 ">
+            and book_id in
+            <foreach collection="id" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findBookList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_book where is_delete = 0
+    </select>
+</mapper>

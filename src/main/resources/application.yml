@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/book_library?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: 123456
+      db-type: mysql
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: book-library
+
+server:
+  port: 9999

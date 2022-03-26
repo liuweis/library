@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.library.mapper.OrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.book.library.domain.Order">
+        <result column="book_id" property="bookId" />
+        <result column="book_num" property="bookNum" />
+        <result column="price" property="price" />
+        <result column="is_delete" property="isDelete" />
+        <result column="create_time" property="createTime" />
+        <result column="created_by" property="createdBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        order_id,
+        book_id,
+        book_num,
+        price,
+        create_time,
+        created_by,
+        update_time,
+        updated_by
+    </sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="SEARCH_WHERE">
+        is_deleted = 0
+        <if test="orderId != null">
+            AND order_id = #{orderId}
+        </if>
+        <if test="bookId != null">
+            AND book_id = #{bookId}
+        </if>
+        <if test="bookNum != null">
+            AND book_num = #{bookNum}
+        </if>
+        <if test="price != null">
+            AND price = #{price}
+        </if>
+        <if test="isDelete != null">
+            AND is_delete = #{isDelete}
+        </if>
+    </sql>
+
+    <!-- 批量插入-->
+    <insert id="insertBatch">
+        INSERT INTO
+        t_order
+        (
+        <include refid="Base_Column_List" />
+        )
+        VALUES
+        <foreach collection="list" item= "item" index ="index" separator=",">
+        (
+            #{item.orderId },
+            #{item.bookId },
+            #{item.bookNum },
+            #{item.price },
+            #{item.createTime },
+            #{item.createdBy },
+            #{item.updateTime },
+            #{item.updatedBy}
+        )
+        </foreach >
+    </insert>
+
+    <!-- 批量修改-->
+    <update id="updateBatch">
+        update t_order
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="order_id =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.orderId != null">
+                        when id=#{item.id}
+                        then #{item.orderId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="book_id =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.bookId != null">
+                        when id=#{item.id}
+                        then #{item.bookId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="book_num =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.bookNum != null">
+                        when id=#{item.id}
+                        then #{item.bookNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="price =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.price != null">
+                        when id=#{item.id}
+                        then #{item.price}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="is_delete =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.isDelete != null">
+                        when id=#{item.id}
+                        then #{item.isDelete}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createTime != null">
+                        when id=#{item.id}
+                        then #{item.createTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="created_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createdBy != null">
+                        when id=#{item.id}
+                        then #{item.createdBy}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="update_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updateTime != null">
+                        when id=#{item.id}
+                        then #{item.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="updated_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updatedBy != null">
+                        when id=#{item.id}
+                        then #{item.updatedBy}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <select id="getOrderDetail" resultType="com.book.library.domain.vo.OrderDetailVO">
+        SELECT
+            c.username,
+            a.book_name,
+            a.price,
+            b.book_num,
+            b.price AS total_price
+        FROM
+            t_book a
+            LEFT JOIN t_order b ON a.book_id = b.book_id and b.is_delete = 0
+            LEFT JOIN t_user c ON b.created_by = c.user_id
+
+        <where>
+            <if test="user.userId != null and user.userId != 0">
+                b.created_by = #{user.userId,jdbcType=INTEGER}
+            </if>
+            <if test="user.username != null and user.username != '' ">
+                b.username = #{user.username,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+</mapper>
